@@ -16,4 +16,5 @@ Configuring this script:
 Using this script:
 
 You can just launch this file and it will grab images from the last page of your submissions or use certain link as an argument like this:
+
     ./grabber.py https://www.furaffinity.net/gallery/kacey
