@@ -9,11 +9,10 @@ You will need:
 4. python with requests and beautifulsoup4 libraries. to get the libraries you have to launch following commands in your shell from administrator
     pip install requests[socks]
     pip install beautifulsoup4
-
+    pip install lxml
 Configuring this script:
 1. write path to your download directory
 2. write path to your cookies directory
-
 Using this script:
 You can just launch this file and it will grab images from the last page of your submissions or use certain link as an argument like this:
     ./grabber.py https://www.furaffinity.net/gallery/kacey
@@ -48,13 +47,13 @@ def get_cookies(cj, ff_cookies, filter):
 base_url = 'https://furaffinity.net/'
 
 # you need cookies for access through tor because by default you get capcha page
-cookie_path = '/path/to/browser/cookies.sqlite'
+cookie_path = '/home/mfaust/.moonchild productions/pale moon/a0f72nih.default/cookies.sqlite'
 
 # write address of directory where images should be downloaded
-res_directory = '/home/user/Pictures/furaffinity/'
+res_directory = '/home/mfaust/Pictures/update/test/'
 
 # User-agent is essentially important for getting page isntead of 403 error
-headers = 'Mozilla/5.0 (X11; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'
+useragent = 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Goanna/4.8 Firefox/68.0 PaleMoon/29.2.1'
 
 # without any given link it downloads the last page of your submissions. downloading the whole list of submissions and galleries is yet to be added
 if len(argv) < 2:
@@ -70,13 +69,13 @@ proxies = {"https": "socks5://127.0.0.1:9050", "http": "socks5://127.0.0.1:9050"
 sess = requests.Session()
 cjar_fa = cookiejar.CookieJar()
 get_cookies(cjar_fa, cookie_path, 'furaffinity')
-sess.headers['User-Agent'] = headers
+sess.headers['User-Agent'] = useragent
 sess.cookies = cjar_fa
 
 sess_cdn = requests.Session()
 cjar_cdn = cookiejar.CookieJar()
 get_cookies(cjar_cdn, cookie_path, 'facdn')
-sess_cdn.headers['User-Agent'] = headers
+sess_cdn.headers['User-Agent'] = useragent
 sess_cdn.cookies = cjar_cdn
 
 # open and parse start page
@@ -94,8 +93,10 @@ for timage in soup.find_all(class_ = 't-image'):
         file_name = re.search(r'.+\/(.+)', image_link[1])[1]
         pathtofile = path.join(res_directory + file_name)
         with open(pathtofile, 'wb') as file:
-            cdn_resp = sess_cdn.get('https:' + image_link[1], proxies=proxies)
+            #cdn_resp = sess_cdn.get('https:' + image_link[1], proxies=proxies)
+            cdn_resp = sess.get('https:' + image_link[1], proxies=proxies)
             file.write(cdn_resp.content)
             quant_downloaded += 1
             print('saved file ' + file_name)
+	    
 print('total number of downloaded images: ' + str(quant_downloaded))
